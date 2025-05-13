@@ -46,7 +46,7 @@ sudo apt-get install -y wget cmake build-essential unzip git
 
 ```bash
    git clone https://github.com/Trapped-Bird/Ronald-webserver.git
-   cd ronald-webserver
+   cd Ronald-webserver
 ```
 
 2. Create build directory and compile:
