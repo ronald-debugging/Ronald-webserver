@@ -15,8 +15,8 @@ class EventLoop;
 class Socket;
 
 /**
- * TcpServer => Acceptor => When there is a new user connection, get connfd through accept function
- * => TcpConnection sets callbacks => Sets to Channel => Poller => Channel callbacks
+ * TcpServer => Acceptor => A new user connection is obtained through the accept function to get connfd
+ * => TcpConnection sets callback => sets to Channel => Poller => Channel callback
  **/
 
 class TcpConnection : noncopyable, public std::enable_shared_from_this<TcpConnection>
@@ -62,7 +62,7 @@ public:
 private:
     enum StateE
     {
-        kDisconnected, // Connection already disconnected
+        kDisconnected, // Already disconnected
         kConnecting,   // Connecting
         kConnected,    // Connected
         kDisconnecting // Disconnecting
@@ -70,34 +70,34 @@ private:
     void setState(StateE state) { state_ = state; }
 
     void handleRead(Timestamp receiveTime);
-    void handleWrite();// Handle write event
+    void handleWrite();//Handle write event
     void handleClose();
     void handleError();
 
     void sendInLoop(const void *data, size_t len);
     void shutdownInLoop();
     void sendFileInLoop(int fileDescriptor, off_t offset, size_t count);
-    EventLoop *loop_; // This loop_ is determined by the number of threads in TcpServer. If it's multi-Reactor, this loop_ points to subloop. If it's single-Reactor, this loop_ points to baseloop
+    EventLoop *loop_; // Here is baseloop or subloop determined by the number of threads created in TcpServer. If it is multi-Reactor, this loop_ points to subloop. If it is single-Reactor, this loop_ points to baseloop
     const std::string name_;
     std::atomic_int state_;
-    bool reading_;// Whether the connection is listening for read events
+    bool reading_;//Whether the connection is listening for read events
 
-    // Socket Channel Similar to Acceptor here    Acceptor => mainloop    TcpConnection => subloop
+    // Socket Channel here is similar to Acceptor. Acceptor => mainloop TcpConnection => subloop
     std::unique_ptr<Socket> socket_;
     std::unique_ptr<Channel> channel_;
 
     const InetAddress localAddr_;
     const InetAddress peerAddr_;
 
-    // These callbacks are also in TcpServer. User registers through TcpServer, TcpServer passes the registered callbacks to TcpConnection, and TcpConnection registers the callbacks to Channel
-    ConnectionCallback connectionCallback_;       // Callback when there's a new connection
-    MessageCallback messageCallback_;             // Callback when there's read/write message
-    WriteCompleteCallback writeCompleteCallback_; // Callback after message sending is complete
+    // These callbacks are also in TcpServer. Users register by writing to TcpServer. TcpServer then passes the registered callbacks to TcpConnection, and TcpConnection registers the callbacks to Channel
+    ConnectionCallback connectionCallback_;       // Callback when there is a new connection
+    MessageCallback messageCallback_;             // Callback when there is a read/write message
+    WriteCompleteCallback writeCompleteCallback_; // Callback after the message is sent
     HighWaterMarkCallback highWaterMarkCallback_; // High water mark callback
-    CloseCallback closeCallback_; // Callback when closing connection
+    CloseCallback closeCallback_; // Callback for closing connection
     size_t highWaterMark_; // High water mark threshold
 
     // Data buffer
-    Buffer inputBuffer_;    // Receive data buffer
-    Buffer outputBuffer_;   // Send data buffer, user sends to outputBuffer_
+    Buffer inputBuffer_;    // Buffer for receiving data
+    Buffer outputBuffer_;   // Buffer for sending data. User sends to outputBuffer_
 };

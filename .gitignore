@@ -3,3 +3,4 @@ bin/
 *.o
 *.out
 *.log
+.vscode/
